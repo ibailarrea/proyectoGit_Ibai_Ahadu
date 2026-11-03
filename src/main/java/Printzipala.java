@@ -37,20 +37,46 @@ public class Printzipala{
 
     }
     private void deleteLogin() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteLogin'");
+        int id;
+
+        System.out.println("What ID do you want to delete: ");
+        id= scanner.nextInt();
+
+        // login.delete(id);
+        
     }
     private void addLogin() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addLogin'");
+        int id;
+        String password;
+        String username;
+        String tab;
+
+        System.out.println("Id: ");
+        id= scanner.nextInt();
+        tab= scanner.nextLine();
+        System.out.println("Username: ");
+        username= scanner.nextLine();
+        tab= scanner.nextLine();
+        System.out.println("Password: ");
+        password = scanner.nextLine();
+        tab= scanner.nextLine();
+
+        // login.add( new Person(id,username,password));
+        System.out.println(" Sortuta :" + id + "\n" + username + "\n" + password);
     }
     private void queryByID() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'queryByID'");
+        int id;
+
+        System.out.println("What ID do you want to search: ");
+        id= scanner.nextInt();
     }
     private void listLoginID() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'listLoginID'");
+        //list<Person> list = login.getUserList();
+        /*for ( Person person : list){
+            System.out.println(person.toString());
+        }
+
+        */
     }
     private int menua() {
         int aukera;
@@ -65,7 +91,7 @@ public class Printzipala{
     }
     public static void main(String[] args) {
         Printzipala prin = new Printzipala();
-        
+
     }
 
 }
