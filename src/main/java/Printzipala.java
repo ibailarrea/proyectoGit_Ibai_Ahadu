@@ -5,6 +5,7 @@ public class Printzipala{
     Scanner scanner;
     UserList userList;
     
+    
 
     public Printzipala(){
         scanner= new Scanner(System.in);

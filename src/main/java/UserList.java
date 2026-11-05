@@ -43,7 +43,7 @@ public class UserList {
             return false;
         }
 
-        userList.remove(user);
+        userList.remove(getUserById(user.getId()));
         return true;
 
     }
