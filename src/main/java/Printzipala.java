@@ -1,11 +1,14 @@
+import java.util.List;
 import java.util.Scanner;
 
 public class Printzipala{
     Scanner scanner;
+    UserList userList;
     
 
     public Printzipala(){
         scanner= new Scanner(System.in);
+        userList = new UserList();
         hasieratu();
         
     }
@@ -38,11 +41,30 @@ public class Printzipala{
     }
     private void deleteLogin() {
         int id;
+        List<User> list = userList.getUser();
+        boolean found = false;
+        User user = new User(0,null,null);
 
         System.out.println("What ID do you want to delete: ");
         id= scanner.nextInt();
 
-        // login.delete(id);
+        for ( User person : list){
+
+            if(person.getId() == id){
+                System.out.println("Deleting: " + person.toString());
+                user= person;
+                found = true;
+            }
+
+        }
+        if (found == false){
+            System.out.println("This id doesn't exist");
+        }else{
+            userList.deleteUser(user);
+        }
+
+
+        
         
     }
     private void addLogin() {
@@ -56,27 +78,43 @@ public class Printzipala{
         tab= scanner.nextLine();
         System.out.println("Username: ");
         username= scanner.nextLine();
-        tab= scanner.nextLine();
+        
         System.out.println("Password: ");
         password = scanner.nextLine();
-        tab= scanner.nextLine();
+        
 
-        // login.add( new Person(id,username,password));
+        userList.addUser( new User(id,username,password));
         System.out.println(" Sortuta :" + id + "\n" + username + "\n" + password);
     }
     private void queryByID() {
         int id;
+        List<User> list = userList.getUser();
+        boolean found = false;
 
         System.out.println("What ID do you want to search: ");
         id= scanner.nextInt();
+        
+        for ( User person : list){
+
+            if(person.getId() == id){
+                System.out.println("The user is: " + person.toString());
+                found = true;
+            }
+
+        }
+        if (found == false){
+            System.out.println("This id doesn't exist");
+        }
+
     }
     private void listLoginID() {
-        //list<Person> list = login.getUserList();
-        /*for ( Person person : list){
+        List<User> list = userList.getUser();
+        for ( User person : list){
+
             System.out.println(person.toString());
         }
 
-        */
+        
     }
     private int menua() {
         int aukera;
