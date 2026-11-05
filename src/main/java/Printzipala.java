@@ -3,6 +3,7 @@ import java.util.Scanner;
 public class Printzipala{
     Scanner scanner;
     
+    
 
     public Printzipala(){
         scanner= new Scanner(System.in);
@@ -42,6 +43,10 @@ public class Printzipala{
         System.out.println("What ID do you want to delete: ");
         id= scanner.nextInt();
 
+
+
+        
+
         // login.delete(id);
         
     }
@@ -62,6 +67,7 @@ public class Printzipala{
         tab= scanner.nextLine();
 
         // login.add( new Person(id,username,password));
+
         System.out.println(" Sortuta :" + id + "\n" + username + "\n" + password);
     }
     private void queryByID() {
