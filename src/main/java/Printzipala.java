@@ -1,17 +1,18 @@
-import java.util.List;
 import java.util.Scanner;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class Printzipala{
-    Scanner scanner;
-    UserList userList;
+public class Printzipala {
+
+    private static final String ID_NOT_FOUND = "This id doesn't exist";
     private static final String VAULT_FILE = "vault.dat";
-    
+
+    private final Scanner scanner;
+    private final UserList userList;
 
     public Printzipala() {
-        scanner = new Scanner(System.in);
-        userList = new UserList();
+        this.scanner = new Scanner(System.in);
+        this.userList = new UserList();
 
         try {
             userList.loadFromFile(VAULT_FILE);
@@ -23,123 +24,87 @@ public class Printzipala{
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Error loading users: " + e.getMessage());
         }
-
-        hasieratu();
     }
 
-    private void hasieratu() {
-        int aukera= -1;
-        
+    public void hasieratu() {
+        int aukera = -1;
 
-        while (aukera!=0) {
+        while (aukera != 0) {
             aukera = menua();
-            switch (aukera) {
-                case 1: listLoginID();
-                    
-                    break;
-                case 2: queryByID();
-                    
-                    break;
-                case 3: addLogin();
-                    
-                    break;
-                case 4: deleteLogin();
-                    break;
-                case 0: 
-                break;
-                default:
-                    System.out.println("Is not a possible option, put an other one ");
-                    break;
+            if (aukera != 0) {
+                exekutatu(aukera);
             }
         }
-
     }
-    private void deleteLogin() {
-        int id;
-        List<User> list = userList.getUser();
-        boolean found = false;
-        User user = new User(0,null,null);
 
-        System.out.println("What ID do you want to delete: ");
-        id= scanner.nextInt();
-
-        for ( User person : list){
-
-            if(person.getId() == id){
-                System.out.println("Deleting: " + person.toString());
-                user= person;
-                found = true;
-            }
-
+    private void exekutatu(int aukera) {
+        switch (aukera) {
+            case 1:
+                listLoginID();
+                break;
+            case 2:
+                queryByID();
+                break;
+            case 3:
+                addLogin();
+                break;
+            case 4:
+                deleteLogin();
+                break;
+            default:
+                System.out.println("Is not a possible option, put an other one ");
         }
-        if (found == false){
-            System.out.println("This id doesn't exist");
-        }else{
-            if (userList.deleteUser(user)) {
+    }
+
+    private void deleteLogin() {
+        System.out.println("What ID do you want to delete: ");
+        User person = userList.getUserById(scanner.nextInt());
+
+        if (person == null) {
+            System.out.println(ID_NOT_FOUND);
+        } else {
+            System.out.println("Deleting: " + person);
+
+            if (userList.deleteUser(person)) {
                 saveUsers();
                 System.out.println("User deleted successfully.");
-            }       
+            }
         }
-
-
-
-        
-        
     }
-    private void addLogin() {
-        int id;
-        String password;
-        String username;
-        String tab;
 
+    private void addLogin() {
         System.out.println("Id: ");
-        id= scanner.nextInt();
-        tab= scanner.nextLine();
+        int id = scanner.nextInt();
+
         System.out.println("Username: ");
-        username= scanner.nextLine();
-        
+        String username = readNonEmptyLine();
+
         System.out.println("Password: ");
-        password = scanner.nextLine();
-        
+        String password = readNonEmptyLine();
 
         if (userList.addUser(new User(id, username, password))) {
             saveUsers();
-            System.out.println("User added successfully.");
+            System.out.println(" Sortuta :" + id + "\n" + username + "\n" + password);
         } else {
-            System.out.println("This ID already exists.");
-        }   
-        
-        System.out.println(" Sortuta :" + id + "\n" + username + "\n" + password);
+            System.out.println("This id already exists");
+        }
     }
+
     private void queryByID() {
-        int id;
-        List<User> list = userList.getUser();
-        boolean found = false;
-
         System.out.println("What ID do you want to search: ");
-        id= scanner.nextInt();
-        
-        for ( User person : list){
+        User person = userList.getUserById(scanner.nextInt());
 
-            if(person.getId() == id){
-                System.out.println("The user is: " + person.toString());
-                found = true;
-            }
-
+        if (person == null) {
+            System.out.println(ID_NOT_FOUND);
+        } else {
+            System.out.println("The user is: " + person);
         }
-        if (found == false){
-            System.out.println("This id doesn't exist");
-        }
-
     }
+
     private void listLoginID() {
-        List<User> list = userList.getUser();
-        for ( User person : list){
-
-            System.out.println(person.toString());
+        for (User person : userList.getUser()) {
+            System.out.println(person);
         }
-
-        
     }
 
     private void saveUsers() {
@@ -148,24 +113,32 @@ public class Printzipala{
             System.out.println("Users saved successfully.");
 
         } catch (IOException e) {
-        System.out.println("Error saving users: " + e.getMessage());
+            System.out.println("Error saving users: " + e.getMessage());
         }
     }
 
     private int menua() {
-        int aukera;
         System.out.println("Choose one option: ");
         System.out.println("1-List Login IDs ");
         System.out.println("2-Query by ID ");
         System.out.println("3-Add Login ");
         System.out.println("4-Delete Login ");
         System.out.println("0-exit ");
-        aukera= scanner.nextInt();
-        return aukera;
+        return scanner.nextInt();
     }
+
+    private String readNonEmptyLine() {
+        String line = scanner.nextLine();
+        while (line.trim().isEmpty()) {
+            line = scanner.nextLine();
+        }
+        return line;
+    }
+
     public static void main(String[] args) {
         Printzipala prin = new Printzipala();
-
+        prin.hasieratu();
     }
-
 }
+
+
