@@ -1,17 +1,32 @@
 import java.util.List;
 import java.util.Scanner;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class Printzipala{
     Scanner scanner;
     UserList userList;
+    private static final String VAULT_FILE = "vault.dat";
     
 
-    public Printzipala(){
-        scanner= new Scanner(System.in);
+    public Printzipala() {
+        scanner = new Scanner(System.in);
         userList = new UserList();
+
+        try {
+            userList.loadFromFile(VAULT_FILE);
+            System.out.println("Users loaded successfully.");
+
+        } catch (FileNotFoundException e) {
+            System.out.println("No vault file found. Starting with an empty list.");
+
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Error loading users: " + e.getMessage());
+        }
+
         hasieratu();
-        
     }
+
     private void hasieratu() {
         int aukera= -1;
         
@@ -60,8 +75,12 @@ public class Printzipala{
         if (found == false){
             System.out.println("This id doesn't exist");
         }else{
-            userList.deleteUser(user);
+            if (userList.deleteUser(user)) {
+                saveUsers();
+                System.out.println("User deleted successfully.");
+            }       
         }
+
 
 
         
@@ -83,7 +102,13 @@ public class Printzipala{
         password = scanner.nextLine();
         
 
-        userList.addUser( new User(id,username,password));
+        if (userList.addUser(new User(id, username, password))) {
+            saveUsers();
+            System.out.println("User added successfully.");
+        } else {
+            System.out.println("This ID already exists.");
+        }   
+        
         System.out.println(" Sortuta :" + id + "\n" + username + "\n" + password);
     }
     private void queryByID() {
@@ -116,6 +141,17 @@ public class Printzipala{
 
         
     }
+
+    private void saveUsers() {
+        try {
+            userList.saveToFile(VAULT_FILE);
+            System.out.println("Users saved successfully.");
+
+        } catch (IOException e) {
+        System.out.println("Error saving users: " + e.getMessage());
+        }
+    }
+
     private int menua() {
         int aukera;
         System.out.println("Choose one option: ");

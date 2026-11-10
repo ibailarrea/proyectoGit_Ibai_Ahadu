@@ -1,8 +1,11 @@
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
     
     private int id;
     private String username;
     private String password;
+    private static final long serialVersionUID = 1L;
 
     public User(int id, String username, String password) {
         this.id = id;

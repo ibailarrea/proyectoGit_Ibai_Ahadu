@@ -107,6 +107,51 @@ public class PrintzipalaTest {
 
    
 
+    @Test
+    void testAddDuplicateLogin() {
+        run("3\n1\nibai\n1234\n0\n");
+
+        String output = run("3\n1\notro\n5678\n0\n");
+
+        assertTrue(output.contains("This ID already exists."));
+    }
+
+    @Test
+    void testDeleteLoginNotFound() {
+        String output = run("4\n99\n0\n");
+
+        assertTrue(output.contains("This id doesn't exist"));
+    }
+
+    @Test
+    void testQueryByIDNotFound() {
+        String output = run("2\n99\n0\n");
+
+        assertTrue(output.contains("This id doesn't exist"));
+    }
+
+
+    @Test
+    void testQueryByIDFound() {
+        run("3\n10\nana\n1234\n0\n");
+
+        String output = run("2\n10\n0\n");
+
+        assertTrue(output.contains("The user is:"));
+        assertTrue(output.contains("username=ana"));
+    }
+
+    @Test
+    void testDeleteLoginFound() {
+        run("3\n10\nana\n1234\n0\n");
+
+        String output = run("4\n10\n0\n");
+
+        assertTrue(output.contains("User deleted successfully."));
+    }
+
+   
+
     
 
 }

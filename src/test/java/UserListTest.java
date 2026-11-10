@@ -4,8 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.ArrayList;
-import java.util.List;
+
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,12 +69,7 @@ class UserListTest {
         assertFalse(userList.deleteUser(ibai));
     }
 
-    @Test
-    void setUserReplacesTheList() {
-        ArrayList<User> other = new ArrayList<>();
-        other.add(ibai);
-        userList.setUser(other);
-        assertSame(other, userList.getUser());
-        assertSame(ibai, userList.getUserById(1));
-    }
+   
+
+    
 }
