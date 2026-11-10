@@ -1,8 +1,11 @@
 import java.util.Scanner;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class Printzipala {
 
     private static final String ID_NOT_FOUND = "This id doesn't exist";
+    private static final String VAULT_FILE = "vault.dat";
 
     private final Scanner scanner;
     private final UserList userList;
@@ -10,6 +13,17 @@ public class Printzipala {
     public Printzipala() {
         this.scanner = new Scanner(System.in);
         this.userList = new UserList();
+
+        try {
+            userList.loadFromFile(VAULT_FILE);
+            System.out.println("Users loaded successfully.");
+
+        } catch (FileNotFoundException e) {
+            System.out.println("No vault file found. Starting with an empty list.");
+
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Error loading users: " + e.getMessage());
+        }
     }
 
     public void hasieratu() {
@@ -50,7 +64,11 @@ public class Printzipala {
             System.out.println(ID_NOT_FOUND);
         } else {
             System.out.println("Deleting: " + person);
-            userList.deleteUser(person);
+
+            if (userList.deleteUser(person)) {
+                saveUsers();
+                System.out.println("User deleted successfully.");
+            }
         }
     }
 
@@ -65,6 +83,7 @@ public class Printzipala {
         String password = readNonEmptyLine();
 
         if (userList.addUser(new User(id, username, password))) {
+            saveUsers();
             System.out.println(" Sortuta :" + id + "\n" + username + "\n" + password);
         } else {
             System.out.println("This id already exists");
@@ -85,6 +104,16 @@ public class Printzipala {
     private void listLoginID() {
         for (User person : userList.getUser()) {
             System.out.println(person);
+        }
+    }
+
+    private void saveUsers() {
+        try {
+            userList.saveToFile(VAULT_FILE);
+            System.out.println("Users saved successfully.");
+
+        } catch (IOException e) {
+            System.out.println("Error saving users: " + e.getMessage());
         }
     }
 
@@ -110,5 +139,6 @@ public class Printzipala {
         Printzipala prin = new Printzipala();
         prin.hasieratu();
     }
-
 }
+
+

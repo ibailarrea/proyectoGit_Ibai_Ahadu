@@ -1,23 +1,27 @@
 import java.util.ArrayList;
-import java.util.List;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.IOException;
 
 public class UserList {
-    private List<User> userList;
+    ArrayList<User> users;
 
     public UserList() {
-        userList = new ArrayList<>();
+        users = new ArrayList<>();
     }
 
-    public List<User> getUser() {
-        return userList;
+    public ArrayList<User> getUser() {
+        return users;
     }
 
-    public void setUser(List<User> user) {
-        this.userList = user;
+    public void setUser(ArrayList<User> user) {
+        this.users = user;
     }
 
     public User getUserById(int id) {
-        for (User user : userList) {
+        for (User user : users) {
             if (user.getId() == id) {
                 return user;
             }
@@ -30,16 +34,40 @@ public class UserList {
             return false;
         }
 
-        userList.add(user);
+        users.add(user);
         return true;
     }
 
     public boolean deleteUser(User user) {
-        User existing = getUserById(user.getId());
-        if (existing == null) {
+        User existingUser = getUserById(user.getId());
+
+        if (existingUser == null) {
             return false;
         }
 
-        return userList.remove(existing);
+        users.remove(existingUser);
+        return true;
+    }
+
+    public void saveToFile(String filePath) throws IOException {
+        try (ObjectOutputStream output =
+                new ObjectOutputStream(new FileOutputStream(filePath))) {
+
+            output.writeObject(users);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public void loadFromFile(String filePath)
+            throws IOException, ClassNotFoundException {
+
+        try (ObjectInputStream input =
+                new ObjectInputStream(new FileInputStream(filePath))) {
+
+            users = (ArrayList<User>) input.readObject();
+        }
     }
 }
+
+        
+    
