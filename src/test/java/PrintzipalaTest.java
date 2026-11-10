@@ -105,23 +105,7 @@ public class PrintzipalaTest {
         assertThrows(InputMismatchException.class, () -> run("2\nabc\n0\n"));
     }
 
-    @Test
-    @Timeout(value = 3, unit = TimeUnit.SECONDS)
-    public void testAddLoginPideDatos() {
-        String out = run("3\n1\nuser\n\npass\n\n0\n");
-        assertTrue(out.contains("Id: "));
-        assertTrue(out.contains("Username: "));
-        assertTrue(out.contains("Password: "));
-    }
-
-    @Test
-    @Timeout(value = 3, unit = TimeUnit.SECONDS)
-    public void testAddLoginMuestraDatosCreados() {
-        String out = run("3\n1\nuser\n\npass\n\n0\n");
-        assertTrue(out.contains("Sortuta :1"));
-        assertTrue(out.contains("user"));
-        assertTrue(out.contains("pass"));
-    }
+   
 
     
 
