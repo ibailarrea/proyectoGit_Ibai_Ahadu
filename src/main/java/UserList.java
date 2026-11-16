@@ -50,8 +50,8 @@ public class UserList {
     }
 
     public void saveToFile(String filePath) throws IOException {
-        try (ObjectOutputStream output =
-                new ObjectOutputStream(new FileOutputStream(filePath))) {
+        try (FileOutputStream fos = new FileOutputStream(filePath);
+             ObjectOutputStream output = new ObjectOutputStream(fos)) {
 
             output.writeObject(users);
         }
@@ -61,13 +61,10 @@ public class UserList {
     public void loadFromFile(String filePath)
             throws IOException, ClassNotFoundException {
 
-        try (ObjectInputStream input =
-                new ObjectInputStream(new FileInputStream(filePath))) {
+        try (FileInputStream fis = new FileInputStream(filePath);
+             ObjectInputStream input = new ObjectInputStream(fis)) {
 
             users = (ArrayList<User>) input.readObject();
         }
     }
 }
-
-        
-    
