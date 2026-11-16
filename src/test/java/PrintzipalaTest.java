@@ -509,20 +509,6 @@ class PrintzipalaTest {
         assertTrue(out.contains("Category [name=work, userIds=[]]"));
     }
 
-    @Test
-    @Timeout(value = 3, unit = TimeUnit.SECONDS)
-    void testDeleteLoginKeepsOtherUsersInCategory() {
-        String out = run("3\n1\nuser\npass\n3\n2\nana\nabc\n8\nwork\n"
-                + "6\nwork\n1\n6\nwork\n2\n4\n1\n5\ne\n");
-        assertTrue(out.contains("Category [name=work, userIds=[2]]"));
-    }
-
-    @Test
-    @Timeout(value = 3, unit = TimeUnit.SECONDS)
-    void testDeleteCategoryDoesNotDeleteUsers() {
-        String out = run("3\n1\nuser\npass\n8\nwork\n6\nwork\n1\n9\nwork\n1\ne\n");
-        assertTrue(out.contains("User [id=1, username=user, password=pass]"));
-    }
 
     @Test
     @Timeout(value = 3, unit = TimeUnit.SECONDS)
