@@ -1,3 +1,4 @@
+
 import java.util.Scanner;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -9,10 +10,12 @@ public class Printzipala {
 
     private final Scanner scanner;
     private final UserList userList;
+    private final CategoryList categoryList;
 
     public Printzipala() {
         this.scanner = new Scanner(System.in);
         this.userList = new UserList();
+        this.categoryList = new CategoryList();
 
         try {
             userList.loadFromFile(VAULT_FILE);
@@ -27,38 +30,55 @@ public class Printzipala {
     }
 
     public void hasieratu() {
-        int aukera = -1;
+        String aukera = "";
 
-        while (aukera != 0) {
+        while (!aukera.equalsIgnoreCase("e")) {
             aukera = menua();
-            if (aukera != 0) {
+
+            if (!aukera.equalsIgnoreCase("e")) {
                 exekutatu(aukera);
             }
         }
     }
 
-    private void exekutatu(int aukera) {
+    private void exekutatu(String aukera) {
         switch (aukera) {
-            case 1:
+            case "1":
                 listLoginID();
                 break;
-            case 2:
+            case "2":
                 queryByID();
                 break;
-            case 3:
+            case "3":
                 addLogin();
                 break;
-            case 4:
+            case "4":
                 deleteLogin();
                 break;
+            case "5":
+                viewCategories();
+                break;
+            case "6":
+                addIDToCategory();
+                break;
+            case "7":
+                removeIDFromCategory();
+                break;
+            case "8":
+                addCategory();
+                break;
+            case "9":
+                deleteCategory();
+                break;
             default:
-                System.out.println("Is not a possible option, put an other one ");
+                System.out.println("Is not a possible option, put another one");
         }
     }
 
     private void deleteLogin() {
         System.out.println("What ID do you want to delete: ");
         User person = userList.getUserById(scanner.nextInt());
+        scanner.nextLine();
 
         if (person == null) {
             System.out.println(ID_NOT_FOUND);
@@ -66,6 +86,10 @@ public class Printzipala {
             System.out.println("Deleting: " + person);
 
             if (userList.deleteUser(person)) {
+                for (Category category : categoryList.getCategories()) {
+                    category.removeUserId(person.getId());
+                }
+
                 saveUsers();
                 System.out.println("User deleted successfully.");
             }
@@ -75,6 +99,7 @@ public class Printzipala {
     private void addLogin() {
         System.out.println("Id: ");
         int id = scanner.nextInt();
+        scanner.nextLine();
 
         System.out.println("Username: ");
         String username = readNonEmptyLine();
@@ -93,6 +118,7 @@ public class Printzipala {
     private void queryByID() {
         System.out.println("What ID do you want to search: ");
         User person = userList.getUserById(scanner.nextInt());
+        scanner.nextLine();
 
         if (person == null) {
             System.out.println(ID_NOT_FOUND);
@@ -107,6 +133,70 @@ public class Printzipala {
         }
     }
 
+    private void viewCategories() {
+        if (categoryList.getCategories().isEmpty()) {
+            System.out.println("There are no categories.");
+        } else {
+            for (Category category : categoryList.getCategories()) {
+                System.out.println(category);
+            }
+        }
+    }
+
+    private void addIDToCategory() {
+        System.out.println("Category name: ");
+        String name = readNonEmptyLine();
+
+        System.out.println("User ID: ");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+
+        if (userList.getUserById(id) == null) {
+            System.out.println(ID_NOT_FOUND);
+        } else if (categoryList.addUserToCategory(name, id)) {
+            System.out.println("User added to category successfully.");
+        } else {
+            System.out.println("Category doesn't exist or user is already in it.");
+        }
+    }
+
+    private void removeIDFromCategory() {
+        System.out.println("Category name: ");
+        String name = readNonEmptyLine();
+
+        System.out.println("User ID: ");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+
+        if (categoryList.removeUserFromCategory(name, id)) {
+            System.out.println("User removed from category successfully.");
+        } else {
+            System.out.println("Category doesn't exist or user isn't in it.");
+        }
+    }
+
+    private void addCategory() {
+        System.out.println("Category name: ");
+        String name = readNonEmptyLine();
+
+        if (categoryList.addCategory(new Category(name))) {
+            System.out.println("Category created successfully.");
+        } else {
+            System.out.println("This category already exists.");
+        }
+    }
+
+    private void deleteCategory() {
+        System.out.println("Category name: ");
+        String name = readNonEmptyLine();
+
+        if (categoryList.deleteCategory(name)) {
+            System.out.println("Category deleted successfully.");
+        } else {
+            System.out.println("This category doesn't exist.");
+        }
+    }
+
     private void saveUsers() {
         try {
             userList.saveToFile(VAULT_FILE);
@@ -117,21 +207,29 @@ public class Printzipala {
         }
     }
 
-    private int menua() {
-        System.out.println("Choose one option: ");
-        System.out.println("1-List Login IDs ");
-        System.out.println("2-Query by ID ");
-        System.out.println("3-Add Login ");
-        System.out.println("4-Delete Login ");
-        System.out.println("0-exit ");
-        return scanner.nextInt();
+    private String menua() {
+        System.out.println("\nChoose one option: ");
+        System.out.println("1-List Login IDs");
+        System.out.println("2-Query by ID");
+        System.out.println("3-Add Login");
+        System.out.println("4-Delete Login");
+        System.out.println("5-View Categories and Login IDs");
+        System.out.println("6-Add ID to Category");
+        System.out.println("7-Remove ID from Category");
+        System.out.println("8-Add Category");
+        System.out.println("9-Delete Category");
+        System.out.println("e-Exit");
+
+        return readNonEmptyLine();
     }
 
     private String readNonEmptyLine() {
         String line = scanner.nextLine();
+
         while (line.trim().isEmpty()) {
             line = scanner.nextLine();
         }
+
         return line;
     }
 
@@ -140,5 +238,3 @@ public class Printzipala {
         prin.hasieratu();
     }
 }
-
-
