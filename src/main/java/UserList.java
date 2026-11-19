@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
@@ -6,10 +8,13 @@ import java.io.ObjectOutputStream;
 import java.io.IOException;
 
 public class UserList {
+
     ArrayList<User> users;
+    private HashMap<Integer, Long> deletedUsers;
 
     public UserList() {
         users = new ArrayList<>();
+        deletedUsers = new HashMap<>();
     }
 
     public ArrayList<User> getUser() {
@@ -45,6 +50,9 @@ public class UserList {
             return false;
         }
 
+        // Guardamos cuándo se ha eliminado el usuario.
+        deletedUsers.put(user.getId(), System.currentTimeMillis());
+
         users.remove(existingUser);
         return true;
     }
@@ -66,5 +74,40 @@ public class UserList {
 
             users = (ArrayList<User>) input.readObject();
         }
+
+        // Los usuarios de archivos antiguos no tendrán fecha de modificación.
+        for (User user : users) {
+            if (user.getLastModified() <= 0) {
+                user.setLastModified(System.currentTimeMillis());
+            }
+        }
+    }
+
+    public void saveDeletedUsers(String filePath) throws IOException {
+        try (ObjectOutputStream output =
+                new ObjectOutputStream(new FileOutputStream(filePath))) {
+
+            output.writeObject(deletedUsers);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public void loadDeletedUsers(String filePath)
+            throws IOException, ClassNotFoundException {
+
+        try (ObjectInputStream input =
+                new ObjectInputStream(new FileInputStream(filePath))) {
+
+            deletedUsers = (HashMap<Integer, Long>) input.readObject();
+        }
+    }
+
+    public SyncData createSyncData() {
+        return new SyncData(users, deletedUsers);
+    }
+
+    public void updateFromSyncData(SyncData data) {
+        users = new ArrayList<>(data.getUsers());
+        deletedUsers = new HashMap<>(data.getDeletedUsers());
     }
 }
