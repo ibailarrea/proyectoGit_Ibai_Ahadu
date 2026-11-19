@@ -1,7 +1,6 @@
 
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
@@ -42,14 +41,12 @@ class SyncDataTest {
         remoteUser.setLastModified(200L);
         remoteUsers.add(remoteUser);
 
-        SyncData remote = new SyncData(
-                remoteUsers, new HashMap<>());
+        SyncData remote = new SyncData(remoteUsers, new HashMap<>());
 
         local.merge(remote);
 
         assertEquals(1, local.getUsers().size());
-        assertEquals("ana",
-                local.getUsers().get(0).getUsername());
+        assertEquals("ana", local.getUsers().get(0).getUsername());
     }
 
     @Test
@@ -66,17 +63,13 @@ class SyncDataTest {
         ArrayList<User> remoteUsers = new ArrayList<>();
         remoteUsers.add(newUser);
 
-        SyncData local = new SyncData(
-                localUsers, new HashMap<>());
-
-        SyncData remote = new SyncData(
-                remoteUsers, new HashMap<>());
+        SyncData local = new SyncData(localUsers, new HashMap<>());
+        SyncData remote = new SyncData(remoteUsers, new HashMap<>());
 
         local.merge(remote);
 
         assertEquals(1, local.getUsers().size());
-        assertEquals("new",
-                local.getUsers().get(0).getUsername());
+        assertEquals("new", local.getUsers().get(0).getUsername());
     }
 
     @Test
@@ -93,16 +86,12 @@ class SyncDataTest {
         ArrayList<User> remoteUsers = new ArrayList<>();
         remoteUsers.add(remoteUser);
 
-        SyncData local = new SyncData(
-                localUsers, new HashMap<>());
-
-        SyncData remote = new SyncData(
-                remoteUsers, new HashMap<>());
+        SyncData local = new SyncData(localUsers, new HashMap<>());
+        SyncData remote = new SyncData(remoteUsers, new HashMap<>());
 
         local.merge(remote);
 
-        assertEquals("local",
-                local.getUsers().get(0).getUsername());
+        assertEquals("local", local.getUsers().get(0).getUsername());
     }
 
     @Test
@@ -111,8 +100,7 @@ class SyncDataTest {
         remoteDeleted.put(1, 200L);
 
         SyncData local = new SyncData();
-        SyncData remote = new SyncData(
-                new ArrayList<>(), remoteDeleted);
+        SyncData remote = new SyncData(new ArrayList<>(), remoteDeleted);
 
         local.merge(remote);
 
@@ -132,7 +120,6 @@ class SyncDataTest {
         deleted.put(1, 200L);
 
         SyncData local = new SyncData(users, deleted);
-
         local.merge(new SyncData());
 
         assertTrue(local.getUsers().isEmpty());
@@ -150,7 +137,6 @@ class SyncDataTest {
         deleted.put(1, 200L);
 
         SyncData local = new SyncData(users, deleted);
-
         local.merge(new SyncData());
 
         assertEquals(1, local.getUsers().size());
@@ -161,8 +147,7 @@ class SyncDataTest {
         HashMap<Integer, Long> deleted = new HashMap<>();
         deleted.put(1, 300L);
 
-        SyncData local = new SyncData(
-                new ArrayList<>(), deleted);
+        SyncData local = new SyncData(new ArrayList<>(), deleted);
 
         User oldUser = new User(1, "ibai", "1234");
         oldUser.setLastModified(100L);
@@ -170,8 +155,7 @@ class SyncDataTest {
         ArrayList<User> remoteUsers = new ArrayList<>();
         remoteUsers.add(oldUser);
 
-        SyncData remote = new SyncData(
-                remoteUsers, new HashMap<>());
+        SyncData remote = new SyncData(remoteUsers, new HashMap<>());
 
         local.merge(remote);
 
@@ -186,11 +170,8 @@ class SyncDataTest {
         HashMap<Integer, Long> remoteDeleted = new HashMap<>();
         remoteDeleted.put(1, 200L);
 
-        SyncData local = new SyncData(
-                new ArrayList<>(), localDeleted);
-
-        SyncData remote = new SyncData(
-                new ArrayList<>(), remoteDeleted);
+        SyncData local = new SyncData(new ArrayList<>(), localDeleted);
+        SyncData remote = new SyncData(new ArrayList<>(), remoteDeleted);
 
         local.merge(remote);
 
@@ -205,11 +186,8 @@ class SyncDataTest {
         ArrayList<User> remoteUsers = new ArrayList<>();
         remoteUsers.add(new User(2, "ana", "5678"));
 
-        SyncData local = new SyncData(
-                localUsers, new HashMap<>());
-
-        SyncData remote = new SyncData(
-                remoteUsers, new HashMap<>());
+        SyncData local = new SyncData(localUsers, new HashMap<>());
+        SyncData remote = new SyncData(remoteUsers, new HashMap<>());
 
         local.merge(remote);
 

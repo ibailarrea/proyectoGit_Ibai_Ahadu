@@ -1,22 +1,25 @@
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 public class CategoryList {
-    private ArrayList<Category> categories;
+
+    private List<Category> categories;
 
     public CategoryList() {
         categories = new ArrayList<>();
     }
 
-    public ArrayList<Category> getCategories() {
+    public List<Category> getCategories() {
         return categories;
     }
 
-    public void setCategories(ArrayList<Category> categories) {
+    public void setCategories(List<Category> categories) {
         this.categories = categories;
     }
 
@@ -87,6 +90,4 @@ public class CategoryList {
             categories = (ArrayList<Category>) input.readObject();
         }
     }
-
-    
 }

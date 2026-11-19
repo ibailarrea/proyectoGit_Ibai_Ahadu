@@ -1,11 +1,11 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class UserList {
 
@@ -51,8 +51,8 @@ public class UserList {
         }
 
         deletedUsers.put(user.getId(), System.currentTimeMillis());
-
         users.remove(existingUser);
+
         return true;
     }
 

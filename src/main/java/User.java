@@ -1,13 +1,14 @@
+
 import java.io.Serializable;
 
 public class User implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private int id;
     private String username;
     private String password;
     private long lastModified;
-
-    private static final long serialVersionUID = 1L;
 
     public User(int id, String username, String password) {
         this.id = id;

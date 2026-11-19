@@ -1,9 +1,13 @@
+
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.IOException;
 import java.net.Socket;
 
-public class SyncClient {
+public final class SyncClient {
+
+    private SyncClient() {
+    }
 
     public static SyncData synchronize(
             String host, int port, SyncData localData)
@@ -22,9 +26,7 @@ public class SyncClient {
             output.writeObject(localData);
             output.flush();
 
-            SyncData receivedData = (SyncData) input.readObject();
-
-            return receivedData;
+            return (SyncData) input.readObject();
         }
     }
 }

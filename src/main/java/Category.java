@@ -1,10 +1,13 @@
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Category implements Serializable {
+
+
     private String name;
-    private ArrayList<Integer> userIds;
+    private List<Integer> userIds;
 
     public Category(String name) {
         this.name = name;
@@ -19,11 +22,11 @@ public class Category implements Serializable {
         this.name = name;
     }
 
-    public ArrayList<Integer> getUserIds() {
+    public List<Integer> getUserIds() {
         return userIds;
     }
 
-    public void setUserIds(ArrayList<Integer> userIds) {
+    public void setUserIds(List<Integer> userIds) {
         this.userIds = userIds;
     }
 

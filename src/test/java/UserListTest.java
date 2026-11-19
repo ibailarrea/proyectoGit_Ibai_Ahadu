@@ -1,23 +1,23 @@
+
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.junit.jupiter.api.io.TempDir;
-
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 class UserListTest {
+
     private UserList userList;
     private User ibai;
 
@@ -138,7 +138,7 @@ class UserListTest {
 
     @Test
     void saveAndLoadDeletedUsers(@TempDir Path dir)
-        throws IOException, ClassNotFoundException {
+            throws IOException, ClassNotFoundException {
 
         userList.addUser(ibai);
         userList.deleteUser(ibai);
@@ -159,11 +159,8 @@ class UserListTest {
     void loadDeletedUsersMissingFile(@TempDir Path dir) {
         String file = dir.resolve("missing.dat").toString();
 
-        assertThrows(IOException.class,
-            () -> userList.loadDeletedUsers(file));
-}
-
-   
-
-    
+        assertThrows(
+                IOException.class,
+                () -> userList.loadDeletedUsers(file));
+    }
 }

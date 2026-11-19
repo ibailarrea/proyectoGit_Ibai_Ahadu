@@ -1,4 +1,5 @@
 
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -36,26 +37,26 @@ class SyncClientTest {
                     try (Socket socket = serverSocket.accept()) {
 
                         ObjectOutputStream output =
-        new ObjectOutputStream(socket.getOutputStream());
+                                new ObjectOutputStream(
+                                        socket.getOutputStream());
 
-output.flush();
+                        output.flush();
 
-ObjectInputStream input =
-        new ObjectInputStream(socket.getInputStream());
+                        ObjectInputStream input =
+                                new ObjectInputStream(
+                                        socket.getInputStream());
 
-SyncData received =
-        (SyncData) input.readObject();
+                        SyncData received =
+                                (SyncData) input.readObject();
 
                         User responseUser =
                                 new User(2, "ana", "5678");
 
-                        ArrayList<User> users =
-                                new ArrayList<>();
-
+                        ArrayList<User> users = new ArrayList<>();
                         users.add(responseUser);
 
-                        SyncData response = new SyncData(
-                                users, new HashMap<>());
+                        SyncData response =
+                                new SyncData(users, new HashMap<>());
 
                         output.writeObject(response);
                         output.flush();
@@ -64,16 +65,13 @@ SyncData received =
                     }
                 });
 
-                User localUser =
-                        new User(1, "ibai", "1234");
+                User localUser = new User(1, "ibai", "1234");
 
-                ArrayList<User> localUsers =
-                        new ArrayList<>();
-
+                ArrayList<User> localUsers = new ArrayList<>();
                 localUsers.add(localUser);
 
-                SyncData localData = new SyncData(
-                        localUsers, new HashMap<>());
+                SyncData localData =
+                        new SyncData(localUsers, new HashMap<>());
 
                 SyncData result = SyncClient.synchronize(
                         "localhost", port, localData);
@@ -83,12 +81,14 @@ SyncData received =
 
                 assertNotNull(received);
                 assertEquals(1, received.getUsers().size());
-                assertEquals("ibai",
+                assertEquals(
+                        "ibai",
                         received.getUsers().get(0).getUsername());
 
                 assertNotNull(result);
                 assertEquals(1, result.getUsers().size());
-                assertEquals("ana",
+                assertEquals(
+                        "ana",
                         result.getUsers().get(0).getUsername());
 
             } finally {

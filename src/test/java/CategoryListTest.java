@@ -1,3 +1,5 @@
+
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -10,11 +12,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.io.TempDir;
 
 class CategoryListTest {
@@ -27,21 +27,18 @@ class CategoryListTest {
     }
 
     @Test
-    @Timeout(value = 3, unit = TimeUnit.SECONDS)
     void testConstructorEmpty() {
         assertNotNull(list.getCategories());
         assertTrue(list.getCategories().isEmpty());
     }
 
     @Test
-    @Timeout(value = 3, unit = TimeUnit.SECONDS)
     void testAddCategory() {
         assertTrue(list.addCategory(new Category("work")));
         assertEquals(1, list.getCategories().size());
     }
 
     @Test
-    @Timeout(value = 3, unit = TimeUnit.SECONDS)
     void testAddCategoryDuplicate() {
         assertTrue(list.addCategory(new Category("work")));
         assertFalse(list.addCategory(new Category("work")));
@@ -49,7 +46,6 @@ class CategoryListTest {
     }
 
     @Test
-    @Timeout(value = 3, unit = TimeUnit.SECONDS)
     void testAddCategoriesDifferentNames() {
         assertTrue(list.addCategory(new Category("work")));
         assertTrue(list.addCategory(new Category("personal")));
@@ -57,7 +53,6 @@ class CategoryListTest {
     }
 
     @Test
-    @Timeout(value = 3, unit = TimeUnit.SECONDS)
     void testNamesAreCaseSensitive() {
         assertTrue(list.addCategory(new Category("work")));
         assertTrue(list.addCategory(new Category("Work")));
@@ -65,80 +60,78 @@ class CategoryListTest {
     }
 
     @Test
-    @Timeout(value = 3, unit = TimeUnit.SECONDS)
     void testGetCategoryByName() {
         Category work = new Category("work");
         list.addCategory(work);
+
         assertSame(work, list.getCategoryByName("work"));
     }
 
     @Test
-    @Timeout(value = 3, unit = TimeUnit.SECONDS)
     void testGetCategoryByNameNotFound() {
         assertNull(list.getCategoryByName("nothing"));
     }
 
     @Test
-    @Timeout(value = 3, unit = TimeUnit.SECONDS)
     void testDeleteCategory() {
         list.addCategory(new Category("work"));
+
         assertTrue(list.deleteCategory("work"));
         assertNull(list.getCategoryByName("work"));
         assertTrue(list.getCategories().isEmpty());
     }
 
     @Test
-    @Timeout(value = 3, unit = TimeUnit.SECONDS)
     void testDeleteCategoryNotFound() {
         assertFalse(list.deleteCategory("nothing"));
     }
 
     @Test
-    @Timeout(value = 3, unit = TimeUnit.SECONDS)
     void testDeleteCategoryKeepsOthers() {
         list.addCategory(new Category("work"));
         list.addCategory(new Category("personal"));
+
         list.deleteCategory("work");
+
         assertNull(list.getCategoryByName("work"));
         assertNotNull(list.getCategoryByName("personal"));
     }
 
     @Test
-    @Timeout(value = 3, unit = TimeUnit.SECONDS)
     void testDeleteCategoryTwice() {
         list.addCategory(new Category("work"));
+
         assertTrue(list.deleteCategory("work"));
         assertFalse(list.deleteCategory("work"));
     }
 
     @Test
-    @Timeout(value = 3, unit = TimeUnit.SECONDS)
     void testAddUserToCategory() {
         list.addCategory(new Category("work"));
+
         assertTrue(list.addUserToCategory("work", 1));
         assertTrue(list.getCategoryByName("work").getUserIds().contains(1));
     }
 
     @Test
-    @Timeout(value = 3, unit = TimeUnit.SECONDS)
     void testAddUserToCategoryNotFound() {
         assertFalse(list.addUserToCategory("nothing", 1));
     }
 
     @Test
-    @Timeout(value = 3, unit = TimeUnit.SECONDS)
     void testAddUserToCategoryDuplicate() {
         list.addCategory(new Category("work"));
+
         assertTrue(list.addUserToCategory("work", 1));
         assertFalse(list.addUserToCategory("work", 1));
         assertEquals(1, list.getCategoryByName("work").getUserIds().size());
     }
 
     @Test
-    @Timeout(value = 3, unit = TimeUnit.SECONDS)
     void testSameUserInSeveralCategories() {
         list.addCategory(new Category("work"));
         list.addCategory(new Category("personal"));
+
         assertTrue(list.addUserToCategory("work", 1));
         assertTrue(list.addUserToCategory("personal", 1));
         assertTrue(list.getCategoryByName("work").getUserIds().contains(1));
@@ -146,32 +139,31 @@ class CategoryListTest {
     }
 
     @Test
-    @Timeout(value = 3, unit = TimeUnit.SECONDS)
     void testRemoveUserFromCategory() {
         list.addCategory(new Category("work"));
         list.addUserToCategory("work", 1);
+
         assertTrue(list.removeUserFromCategory("work", 1));
         assertTrue(list.getCategoryByName("work").getUserIds().isEmpty());
     }
 
     @Test
-    @Timeout(value = 3, unit = TimeUnit.SECONDS)
     void testRemoveUserFromCategoryNotFound() {
         assertFalse(list.removeUserFromCategory("nothing", 1));
     }
 
     @Test
-    @Timeout(value = 3, unit = TimeUnit.SECONDS)
     void testRemoveUserFromCategoryUserNotIn() {
         list.addCategory(new Category("work"));
+
         assertFalse(list.removeUserFromCategory("work", 1));
     }
 
     @Test
-    @Timeout(value = 3, unit = TimeUnit.SECONDS)
     void testRemoveUserOnlyFromThatCategory() {
         list.addCategory(new Category("work"));
         list.addCategory(new Category("personal"));
+
         list.addUserToCategory("work", 1);
         list.addUserToCategory("personal", 1);
 
@@ -182,7 +174,6 @@ class CategoryListTest {
     }
 
     @Test
-    @Timeout(value = 3, unit = TimeUnit.SECONDS)
     void testSetCategories() {
         ArrayList<Category> categories = new ArrayList<>();
         categories.add(new Category("work"));
@@ -194,9 +185,9 @@ class CategoryListTest {
     }
 
     @Test
-    @Timeout(value = 3, unit = TimeUnit.SECONDS)
-    void testSaveAndLoadFile(@TempDir Path dir) throws IOException, ClassNotFoundException {
-        // Requires Category to implement java.io.Serializable
+    void testSaveAndLoadFile(@TempDir Path dir)
+            throws IOException, ClassNotFoundException {
+
         String file = dir.resolve("categories.dat").toString();
 
         list.addCategory(new Category("work"));
@@ -216,8 +207,9 @@ class CategoryListTest {
     }
 
     @Test
-    @Timeout(value = 3, unit = TimeUnit.SECONDS)
-    void testSaveAndLoadEmptyList(@TempDir Path dir) throws IOException, ClassNotFoundException {
+    void testSaveAndLoadEmptyList(@TempDir Path dir)
+            throws IOException, ClassNotFoundException {
+
         String file = dir.resolve("empty.dat").toString();
 
         list.saveToFile(file);
@@ -230,17 +222,19 @@ class CategoryListTest {
     }
 
     @Test
-    @Timeout(value = 3, unit = TimeUnit.SECONDS)
     void testLoadFromMissingFile(@TempDir Path dir) {
         String file = dir.resolve("missing.dat").toString();
-        assertThrows(FileNotFoundException.class, () -> list.loadFromFile(file));
+
+        assertThrows(
+                FileNotFoundException.class,
+                () -> list.loadFromFile(file));
     }
 
     @Test
-    @Timeout(value = 3, unit = TimeUnit.SECONDS)
     void testSaveToInvalidPath(@TempDir Path dir) {
-        String file = dir.resolve("no_such_folder").resolve("categories.dat").toString();
+        String file = dir.resolve("no_such_folder")
+                .resolve("categories.dat").toString();
+
         assertThrows(IOException.class, () -> list.saveToFile(file));
     }
-
 }

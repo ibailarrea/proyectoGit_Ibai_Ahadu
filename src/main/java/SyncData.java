@@ -1,82 +1,135 @@
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.ObjectStreamField;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class SyncData implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private ArrayList<User> users;
-    private HashMap<Integer, Long> deletedUsers;
+    private static final ObjectStreamField[] serialPersistentFields = {
+        new ObjectStreamField("users", ArrayList.class),
+        new ObjectStreamField("deletedUsers", HashMap.class)
+    };
+
+    private List<User> users;
+    private Map<Integer, Long> deletedUsers;
 
     public SyncData() {
         users = new ArrayList<>();
         deletedUsers = new HashMap<>();
     }
 
-    public SyncData(ArrayList<User> users,
-                    HashMap<Integer, Long> deletedUsers) {
-
+    public SyncData(List<User> users, Map<Integer, Long> deletedUsers) {
         this.users = new ArrayList<>(users);
         this.deletedUsers = new HashMap<>(deletedUsers);
     }
 
-    public ArrayList<User> getUsers() {
+    public List<User> getUsers() {
         return users;
     }
 
-    public HashMap<Integer, Long> getDeletedUsers() {
+    public Map<Integer, Long> getDeletedUsers() {
         return deletedUsers;
     }
 
-    public void merge(SyncData other) {
+    private void writeObject(ObjectOutputStream output) throws IOException {
+        ObjectOutputStream.PutField fields = output.putFields();
+        fields.put("users", new ArrayList<>(users));
+        fields.put("deletedUsers", new HashMap<>(deletedUsers));
+        output.writeFields();
+    }
 
+    @SuppressWarnings("unchecked")
+    private void readObject(ObjectInputStream input)
+            throws IOException, ClassNotFoundException {
+
+        ObjectInputStream.GetField fields = input.readFields();
+
+        users = new ArrayList<>(
+                (ArrayList<User>) fields.get("users", new ArrayList<User>()));
+
+        deletedUsers = new HashMap<>(
+                (HashMap<Integer, Long>) fields.get(
+                        "deletedUsers", new HashMap<Integer, Long>()));
+    }
+
+    public void merge(SyncData other) {
+        Map<Integer, User> allUsers = createUserMap();
+
+        mergeIncomingUsers(allUsers, other.getUsers());
+        mergeIncomingDeletions(other.getDeletedUsers());
+        removeDeletedUsers(allUsers);
+
+        users = new ArrayList<>(allUsers.values());
+    }
+
+    private Map<Integer, User> createUserMap() {
         Map<Integer, User> allUsers = new HashMap<>();
 
         for (User user : users) {
             allUsers.put(user.getId(), user);
         }
 
-        for (User incomingUser : other.getUsers()) {
+        return allUsers;
+    }
 
+    private void mergeIncomingUsers(
+            Map<Integer, User> allUsers, List<User> incomingUsers) {
+
+        for (User incomingUser : incomingUsers) {
             int id = incomingUser.getId();
             User currentUser = allUsers.get(id);
 
-            Long deletionTime = deletedUsers.get(id);
-
-            long currentTime = -1;
-
-            if (currentUser != null) {
-                currentTime = currentUser.getLastModified();
-            }
-
-            if (deletionTime != null && deletionTime > currentTime) {
-                currentTime = deletionTime;
-            }
+            long currentTime = getLatestTimestamp(
+                    currentUser, deletedUsers.get(id));
 
             if (incomingUser.getLastModified() > currentTime) {
                 allUsers.put(id, incomingUser);
             }
         }
+    }
 
-        for (Map.Entry<Integer, Long> entry :
-                other.getDeletedUsers().entrySet()) {
+    private long getLatestTimestamp(
+            User currentUser, Long deletionTime) {
 
-            int id = entry.getKey();
-            long incomingDeletionTime = entry.getValue();
+        long latestTime = -1;
 
-            Long currentDeletionTime = deletedUsers.get(id);
-
-            if (currentDeletionTime == null
-                    || incomingDeletionTime > currentDeletionTime) {
-
-                deletedUsers.put(id, incomingDeletionTime);
-            }
+        if (currentUser != null) {
+            latestTime = currentUser.getLastModified();
         }
 
-        for (Map.Entry<Integer, Long> entry : deletedUsers.entrySet()) {
+        if (deletionTime != null && deletionTime > latestTime) {
+            latestTime = deletionTime;
+        }
 
+        return latestTime;
+    }
+
+    private void mergeIncomingDeletions(
+            Map<Integer, Long> incomingDeletions) {
+
+        for (Map.Entry<Integer, Long> entry
+                : incomingDeletions.entrySet()) {
+
+            int id = entry.getKey();
+            long incomingTime = entry.getValue();
+            Long currentTime = deletedUsers.get(id);
+
+            if (currentTime == null || incomingTime > currentTime) {
+                deletedUsers.put(id, incomingTime);
+            }
+        }
+    }
+
+    private void removeDeletedUsers(Map<Integer, User> allUsers) {
+        for (Map.Entry<Integer, Long> entry : deletedUsers.entrySet()) {
             int id = entry.getKey();
             long deletionTime = entry.getValue();
 
@@ -84,11 +137,8 @@ public class SyncData implements Serializable {
 
             if (user != null
                     && deletionTime >= user.getLastModified()) {
-
                 allUsers.remove(id);
             }
         }
-
-        users = new ArrayList<>(allUsers.values());
     }
 }

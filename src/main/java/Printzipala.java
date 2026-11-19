@@ -1,13 +1,18 @@
+
 import java.util.Scanner;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.FileInputStream;
 import java.util.Properties;
 
+@SuppressWarnings("java:S106")
 public class Printzipala {
 
     private static final String ID_NOT_FOUND =
             "This id doesn't exist";
+
+    private static final String CATEGORY_NAME_PROMPT =
+            "Category name: ";
 
     private static final String VAULT_FILE = "vault.dat";
     private static final String DELETED_USERS_FILE = "deleted-users.dat";
@@ -26,7 +31,6 @@ public class Printzipala {
         this.userList = new UserList();
         this.categoryList = new CategoryList();
 
-        // Valores por defecto del servidor.
         serverHost = "localhost";
         serverPort = 5000;
 
@@ -244,7 +248,7 @@ public class Printzipala {
 
     private void addIDToCategory() {
 
-        System.out.println("Category name: ");
+        System.out.println(CATEGORY_NAME_PROMPT);
         String name = readNonEmptyLine();
 
         System.out.println("User ID: ");
@@ -269,7 +273,7 @@ public class Printzipala {
 
     private void removeIDFromCategory() {
 
-        System.out.println("Category name: ");
+        System.out.println(CATEGORY_NAME_PROMPT);
         String name = readNonEmptyLine();
 
         System.out.println("User ID: ");
@@ -290,7 +294,7 @@ public class Printzipala {
 
     private void addCategory() {
 
-        System.out.println("Category name: ");
+        System.out.println(CATEGORY_NAME_PROMPT);
         String name = readNonEmptyLine();
 
         if (categoryList.addCategory(new Category(name))) {
@@ -305,7 +309,7 @@ public class Printzipala {
 
     private void deleteCategory() {
 
-        System.out.println("Category name: ");
+        System.out.println(CATEGORY_NAME_PROMPT);
         String name = readNonEmptyLine();
 
         if (categoryList.deleteCategory(name)) {
@@ -350,7 +354,6 @@ public class Printzipala {
         try {
 
             userList.saveToFile(VAULT_FILE);
-
             userList.saveDeletedUsers(DELETED_USERS_FILE);
 
             System.out.println("Users saved successfully.");
