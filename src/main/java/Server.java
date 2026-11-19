@@ -1,3 +1,4 @@
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
@@ -12,9 +13,15 @@ public class Server {
     private static final int PORT = 5000;
     private static final String SERVER_FILE = "server-vault.dat";
 
+    private final String serverFile;
     private SyncData serverData;
 
     public Server() {
+        this(SERVER_FILE);
+    }
+
+    Server(String serverFile) {
+        this.serverFile = serverFile;
         serverData = new SyncData();
         loadServerData();
     }
@@ -22,7 +29,7 @@ public class Server {
     private void loadServerData() {
 
         try (ObjectInputStream input =
-                new ObjectInputStream(new FileInputStream(SERVER_FILE))) {
+                new ObjectInputStream(new FileInputStream(serverFile))) {
 
             serverData = (SyncData) input.readObject();
             System.out.println("Server data loaded.");
@@ -39,7 +46,7 @@ public class Server {
     private void saveServerData() {
 
         try (ObjectOutputStream output =
-                new ObjectOutputStream(new FileOutputStream(SERVER_FILE))) {
+                new ObjectOutputStream(new FileOutputStream(serverFile))) {
 
             output.writeObject(serverData);
             System.out.println("Server data saved.");
@@ -48,6 +55,29 @@ public class Server {
             System.out.println("Error saving server data: "
                     + e.getMessage());
         }
+    }
+
+    public void handleClient(Socket clientSocket)
+            throws IOException, ClassNotFoundException {
+
+        ObjectOutputStream output =
+                new ObjectOutputStream(clientSocket.getOutputStream());
+
+        output.flush();
+
+        ObjectInputStream input =
+                new ObjectInputStream(clientSocket.getInputStream());
+
+        SyncData clientData = (SyncData) input.readObject();
+
+        serverData.merge(clientData);
+
+        saveServerData();
+
+        output.writeObject(serverData);
+        output.flush();
+
+        System.out.println("Synchronization completed.");
     }
 
     public void start() {
@@ -64,29 +94,7 @@ public class Server {
 
                     System.out.println("Client connected.");
 
-                    ObjectOutputStream output =
-                            new ObjectOutputStream(
-                                    clientSocket.getOutputStream());
-
-                    output.flush();
-
-                    ObjectInputStream input =
-                            new ObjectInputStream(
-                                    clientSocket.getInputStream());
-
-                    SyncData clientData =
-                            (SyncData) input.readObject();
-
-                    // Combinamos los datos del cliente con los del servidor.
-                    serverData.merge(clientData);
-
-                    saveServerData();
-
-                    // Devolvemos los datos actualizados al cliente.
-                    output.writeObject(serverData);
-                    output.flush();
-
-                    System.out.println("Synchronization completed.");
+                    handleClient(clientSocket);
 
                 } catch (IOException | ClassNotFoundException e) {
                     System.out.println("Client error: " + e.getMessage());

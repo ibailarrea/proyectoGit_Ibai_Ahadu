@@ -3,6 +3,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class UserTest {
     private User user;
@@ -40,5 +41,44 @@ class UserTest {
     @Test
     void toStringShowsAllFields() {
         assertEquals("User [id=1, username=ibai, password=1234]", user.toString());
+    }
+
+    @Test
+    void constructorSetsLastModified() {
+        assertTrue(user.getLastModified() > 0);
+    }
+
+    @Test
+    void setLastModifiedChangesValue() {
+        user.setLastModified(100L);
+
+        assertEquals(100L, user.getLastModified());
+    }
+
+    @Test
+    void setUsernameUpdatesLastModified() {
+        user.setLastModified(1L);
+
+        user.setUsername("nuevo");
+
+        assertTrue(user.getLastModified() > 1L);
+    }
+
+    @Test
+    void setPasswordUpdatesLastModified() {
+        user.setLastModified(1L);
+
+        user.setPassword("nuevaClave");
+
+        assertTrue(user.getLastModified() > 1L);
+    }
+
+    @Test
+    void setIdUpdatesLastModified() {
+        user.setLastModified(1L);
+
+        user.setId(5);
+
+        assertTrue(user.getLastModified() > 1L);
     }
 }

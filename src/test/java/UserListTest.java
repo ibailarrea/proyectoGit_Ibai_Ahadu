@@ -3,7 +3,15 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import org.junit.jupiter.api.io.TempDir;
 
 
 import org.junit.jupiter.api.BeforeEach;
@@ -68,6 +76,92 @@ class UserListTest {
     void deleteUserReturnsFalseWhenMissing() {
         assertFalse(userList.deleteUser(ibai));
     }
+
+    @Test
+    void deleteUserStoresDeletionTimestamp() {
+        userList.addUser(ibai);
+
+        assertTrue(userList.deleteUser(ibai));
+
+        SyncData data = userList.createSyncData();
+
+        assertTrue(data.getDeletedUsers().containsKey(1));
+        assertTrue(data.getDeletedUsers().get(1) > 0L);
+    }
+
+    @Test
+    void createSyncDataContainsUsers() {
+        userList.addUser(ibai);
+
+        SyncData data = userList.createSyncData();
+
+        assertEquals(1, data.getUsers().size());
+        assertEquals("ibai", data.getUsers().get(0).getUsername());
+    }
+
+    @Test
+    void createSyncDataContainsDeletedUsers() {
+        userList.addUser(ibai);
+        userList.deleteUser(ibai);
+
+        SyncData data = userList.createSyncData();
+
+        assertTrue(data.getDeletedUsers().containsKey(1));
+    }
+
+    @Test
+    void updateFromSyncDataUpdatesUsers() {
+        ArrayList<User> users = new ArrayList<>();
+        users.add(new User(2, "ana", "1234"));
+
+        SyncData data = new SyncData(users, new HashMap<>());
+
+        userList.updateFromSyncData(data);
+
+        assertEquals(1, userList.getUser().size());
+        assertEquals("ana", userList.getUserById(2).getUsername());
+    }
+
+    @Test
+    void updateFromSyncDataUpdatesDeletedUsers() {
+        HashMap<Integer, Long> deleted = new HashMap<>();
+        deleted.put(5, 100L);
+
+        SyncData data = new SyncData(new ArrayList<>(), deleted);
+
+        userList.updateFromSyncData(data);
+
+        SyncData result = userList.createSyncData();
+
+        assertEquals(100L, result.getDeletedUsers().get(5));
+    }
+
+    @Test
+    void saveAndLoadDeletedUsers(@TempDir Path dir)
+        throws IOException, ClassNotFoundException {
+
+        userList.addUser(ibai);
+        userList.deleteUser(ibai);
+
+        String file = dir.resolve("deleted-users.dat").toString();
+
+        userList.saveDeletedUsers(file);
+
+        UserList loaded = new UserList();
+        loaded.loadDeletedUsers(file);
+
+        SyncData data = loaded.createSyncData();
+
+        assertTrue(data.getDeletedUsers().containsKey(1));
+    }
+
+    @Test
+    void loadDeletedUsersMissingFile(@TempDir Path dir) {
+        String file = dir.resolve("missing.dat").toString();
+
+        assertThrows(IOException.class,
+            () -> userList.loadDeletedUsers(file));
+}
 
    
 

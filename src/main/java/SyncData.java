@@ -34,12 +34,10 @@ public class SyncData implements Serializable {
 
         Map<Integer, User> allUsers = new HashMap<>();
 
-        // Primero incorporamos los usuarios que ya tenemos.
         for (User user : users) {
             allUsers.put(user.getId(), user);
         }
 
-        // Incorporamos los usuarios recibidos si son más recientes.
         for (User incomingUser : other.getUsers()) {
 
             int id = incomingUser.getId();
@@ -62,7 +60,6 @@ public class SyncData implements Serializable {
             }
         }
 
-        // Incorporamos las eliminaciones recibidas.
         for (Map.Entry<Integer, Long> entry :
                 other.getDeletedUsers().entrySet()) {
 
@@ -78,7 +75,6 @@ public class SyncData implements Serializable {
             }
         }
 
-        // Eliminamos los usuarios cuya eliminación sea más reciente.
         for (Map.Entry<Integer, Long> entry : deletedUsers.entrySet()) {
 
             int id = entry.getKey();

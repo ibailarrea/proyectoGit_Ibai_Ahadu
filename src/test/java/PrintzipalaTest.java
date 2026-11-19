@@ -24,6 +24,7 @@ class PrintzipalaTest {
     private static final String MENU = "Choose one option";
     private static final String NOT_FOUND = "This id doesn't exist";
     private static final String VAULT_FILE = "vault.dat";
+    private static final String DELETED_USERS_FILE = "deleted-users.dat";
 
     private PrintStream originalOut;
     private InputStream originalIn;
@@ -34,6 +35,7 @@ class PrintzipalaTest {
         originalIn = System.in;
         // Every test starts without a saved vault, so tests do not affect each other
         Files.deleteIfExists(Paths.get(VAULT_FILE));
+        Files.deleteIfExists(Paths.get(DELETED_USERS_FILE));
     }
 
     @AfterEach
@@ -41,6 +43,7 @@ class PrintzipalaTest {
         System.setOut(originalOut);
         System.setIn(originalIn);
         Files.deleteIfExists(Paths.get(VAULT_FILE));
+        Files.deleteIfExists(Paths.get(DELETED_USERS_FILE));
     }
 
     private String run(String entrada) {
@@ -570,6 +573,28 @@ class PrintzipalaTest {
         String out = run("e\n");
 
         assertTrue(out.contains("Error loading users: "));
+    }
+
+    @Test
+    @Timeout(value = 3, unit = TimeUnit.SECONDS)
+    void testMenuShowsSyncOption() {
+        String out = run("e\n");
+
+        assertTrue(out.contains("s-Synchronize with server"));
+    }
+
+    @Test
+    @Timeout(value = 3, unit = TimeUnit.SECONDS)
+    void testSyncWithoutServer() throws IOException {
+
+        Files.write(
+            Paths.get("config.properties"),
+            "server.host=localhost\nserver.port=0\n".getBytes()
+        );
+
+        String out = run("s\ne\n");
+
+        assertTrue(out.contains("Synchronization failed:"));
     }
 
 }

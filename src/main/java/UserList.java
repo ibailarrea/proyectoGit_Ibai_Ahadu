@@ -50,7 +50,6 @@ public class UserList {
             return false;
         }
 
-        // Guardamos cuándo se ha eliminado el usuario.
         deletedUsers.put(user.getId(), System.currentTimeMillis());
 
         users.remove(existingUser);
@@ -75,7 +74,6 @@ public class UserList {
             users = (ArrayList<User>) input.readObject();
         }
 
-        // Los usuarios de archivos antiguos no tendrán fecha de modificación.
         for (User user : users) {
             if (user.getLastModified() <= 0) {
                 user.setLastModified(System.currentTimeMillis());

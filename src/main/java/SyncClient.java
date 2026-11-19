@@ -11,21 +11,17 @@ public class SyncClient {
 
         try (Socket socket = new Socket(host, port)) {
 
-            // Primero creamos y enviamos el flujo de salida.
             ObjectOutputStream output =
                     new ObjectOutputStream(socket.getOutputStream());
 
             output.flush();
 
-            // Después creamos el flujo de entrada.
             ObjectInputStream input =
                     new ObjectInputStream(socket.getInputStream());
 
-            // Enviamos nuestros datos.
             output.writeObject(localData);
             output.flush();
 
-            // Recibimos los datos actualizados.
             SyncData receivedData = (SyncData) input.readObject();
 
             return receivedData;
