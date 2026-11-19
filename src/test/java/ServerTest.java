@@ -97,5 +97,54 @@ class ServerTest {
     }
 
 
+@Test
+void testServerFileIsSavedAfterSynchronization() throws Exception {
+
+    Path serverFile = tempDir.resolve("saved-server.dat");
+
+    Server server = new Server(serverFile.toString());
+
+    try (ServerSocket serverSocket = new ServerSocket(0)) {
+
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+
+        try {
+            Future<?> future = executor.submit(() -> {
+                try (Socket socket = serverSocket.accept()) {
+                    server.handleClient(socket);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
+            try (Socket client = new Socket(
+                    "localhost", serverSocket.getLocalPort())) {
+
+                ObjectOutputStream output =
+                        new ObjectOutputStream(client.getOutputStream());
+                output.flush();
+
+                ObjectInputStream input =
+                        new ObjectInputStream(client.getInputStream());
+
+                output.writeObject(new SyncData());
+                output.flush();
+
+                assertNotNull(input.readObject());
+            }
+
+            future.get(3, TimeUnit.SECONDS);
+
+            assertTrue(java.nio.file.Files.exists(serverFile));
+            assertTrue(java.nio.file.Files.size(serverFile) > 0);
+
+        } finally {
+            executor.shutdownNow();
+        }
+    }
+}
+
+
+
 
 }
