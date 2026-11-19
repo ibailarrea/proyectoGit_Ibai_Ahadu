@@ -12,11 +12,15 @@ import java.util.Map;
 public class SyncData implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    private static final String USERS_KEY = "users";
+    private static final String DELETED_USERS_KEY = "deletedUsers";
 
+    @SuppressWarnings("unused")
     private static final ObjectStreamField[] serialPersistentFields = {
-        new ObjectStreamField("users", ArrayList.class),
-        new ObjectStreamField("deletedUsers", HashMap.class)
+        new ObjectStreamField(USERS_KEY, ArrayList.class),
+        new ObjectStreamField(DELETED_USERS_KEY, HashMap.class)
     };
+
 
     private List<User> users;
     private Map<Integer, Long> deletedUsers;
@@ -39,13 +43,17 @@ public class SyncData implements Serializable {
         return deletedUsers;
     }
 
+   
     private void writeObject(ObjectOutputStream output) throws IOException {
         ObjectOutputStream.PutField fields = output.putFields();
-        fields.put("users", new ArrayList<>(users));
-        fields.put("deletedUsers", new HashMap<>(deletedUsers));
+
+        fields.put(USERS_KEY, new ArrayList<>(users));
+        fields.put(DELETED_USERS_KEY, new HashMap<>(deletedUsers));
+
         output.writeFields();
     }
 
+    
     @SuppressWarnings("unchecked")
     private void readObject(ObjectInputStream input)
             throws IOException, ClassNotFoundException {
@@ -53,11 +61,12 @@ public class SyncData implements Serializable {
         ObjectInputStream.GetField fields = input.readFields();
 
         users = new ArrayList<>(
-                (ArrayList<User>) fields.get("users", new ArrayList<User>()));
+                (ArrayList<User>) fields.get(
+                        USERS_KEY, new ArrayList<User>()));
 
         deletedUsers = new HashMap<>(
                 (HashMap<Integer, Long>) fields.get(
-                        "deletedUsers", new HashMap<Integer, Long>()));
+                        DELETED_USERS_KEY, new HashMap<Integer, Long>()));
     }
 
     public void merge(SyncData other) {

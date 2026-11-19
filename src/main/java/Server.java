@@ -12,6 +12,7 @@ import java.io.ByteArrayInputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.NoSuchFileException;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Server {
 
@@ -24,10 +25,12 @@ public class Server {
     private final String serverFile;
     private SyncData serverData;
 
+    
     private volatile boolean running;
-    private volatile ServerSocket serverSocket;
+    private final AtomicReference<ServerSocket> serverSocket =
+            new AtomicReference<>();
 
-    private final int port;
+    private final int serverPort;
 
     
     public Server() {
@@ -38,9 +41,9 @@ public class Server {
         this(serverFile, PORT);
     }
 
-    Server(String serverFile, int port) {
+    Server(String serverFile, int serverPort) {
         this.serverFile = serverFile;
-        this.port = port;
+        this.serverPort = serverPort;
         serverData = new SyncData();
         loadServerData();
     }
@@ -103,31 +106,14 @@ public class Server {
     }
 
     public void start() {
-        try (ServerSocket listeningSocket = new ServerSocket(port)) {
+        try (ServerSocket listeningSocket = new ServerSocket(serverPort)) {
 
-            serverSocket = listeningSocket;
+            serverSocket.set(listeningSocket);
             running = true;
 
-            LOGGER.info("Server started on port " + port);
+            LOGGER.info("Server started on port " + serverPort);
 
-            while (running) {
-                try {
-                    handleNextClient(listeningSocket);
-
-                } catch (SocketException e) {
-                    if (running) {
-                        LOGGER.log(Level.WARNING,
-                                "Socket error while accepting client.", e);
-                    }
-                    break;
-
-                } catch (IOException | ClassNotFoundException e) {
-                    if (running) {
-                        LOGGER.log(Level.WARNING,
-                                "Client error: " + e.getMessage(), e);
-                    }
-                }
-            }
+            acceptClients(listeningSocket);
 
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE,
@@ -135,7 +121,28 @@ public class Server {
 
         } finally {
             running = false;
-            serverSocket = null;
+            serverSocket.set(null);
+        }
+    }
+
+    private void acceptClients(ServerSocket listeningSocket) {
+        while (running) {
+            try {
+                handleNextClient(listeningSocket);
+
+            } catch (SocketException e) {
+                if (running) {
+                    LOGGER.log(Level.WARNING,
+                            "Socket error while accepting client.", e);
+                }
+                break;
+
+            } catch (IOException | ClassNotFoundException e) {
+                if (running) {
+                    LOGGER.log(Level.WARNING,
+                            "Client error: " + e.getMessage(), e);
+                }
+            }
         }
     }
 
@@ -148,10 +155,11 @@ public class Server {
         }
     }
 
+    
     public void stop() {
         running = false;
 
-        ServerSocket currentSocket = serverSocket;
+        ServerSocket currentSocket = serverSocket.getAndSet(null);
 
         if (currentSocket != null) {
             try {

@@ -1,6 +1,7 @@
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
@@ -237,11 +238,12 @@ class ServerTest {
         try {
             Future<?> future = executor.submit(server::start);
 
-            long deadline = System.currentTimeMillis() + 3000;
+            long deadline = System.nanoTime()
+                    + TimeUnit.SECONDS.toNanos(3);
 
             while (!server.isRunning()
-                    && System.currentTimeMillis() < deadline) {
-                Thread.sleep(20);
+                    && System.nanoTime() < deadline) {
+                Thread.yield();
             }
 
             assertTrue(server.isRunning(),
@@ -334,11 +336,12 @@ class ServerTest {
         try {
             Future<?> future = executor.submit(server::start);
 
-            long deadline = System.currentTimeMillis() + 3000;
+            long deadline = System.nanoTime()
+                    + TimeUnit.SECONDS.toNanos(3);
 
             while (!server.isRunning()
-                    && System.currentTimeMillis() < deadline) {
-                Thread.sleep(20);
+                    && System.nanoTime() < deadline) {
+                Thread.yield();
             }
 
             assertTrue(server.isRunning());
@@ -346,11 +349,10 @@ class ServerTest {
             try (Socket client = new Socket("localhost", port)) {
                 ObjectOutputStream output =
                         new ObjectOutputStream(client.getOutputStream());
-
                 output.flush();
             }
 
-            Thread.sleep(150);
+            assertTrue(server.isRunning());
 
             server.stop();
 
@@ -361,6 +363,10 @@ class ServerTest {
             executor.shutdownNow();
         }
     }
+
+    
+
+
 
 
 
@@ -381,7 +387,8 @@ class ServerTest {
         }
 
         try (ServerSocket socket = reservedSocket) {
-            Server.main(new String[0]);
+            assertDoesNotThrow(() -> Server.main(new String[0]));
+            assertTrue(socket.isBound());
         }
     }
 
